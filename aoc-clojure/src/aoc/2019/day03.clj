@@ -52,11 +52,10 @@
        (apply min)))
 
 (defn path-distance [paths point]
-  (transduce (comp
-              (map #(take-while (complement #{point}) %))
-              (map count))
-             +
-             paths))
+  (->> paths
+       (map #(take-while (complement #{point}) %))
+       (map count)
+       (reduce +)))
 
 (defn shortest-delay
   "Given set of points where paths intersect, return the point where the sum
@@ -72,9 +71,12 @@
      intersections
      nearest-manhattan
      time)
+;; "Elapsed time: 271.487309 msecs"
+
 
 ;; ans2
 (-> (map wire-path i)
     shortest-delay
     time)
+;; "Elapsed time: 876.94601 msecs"
 
