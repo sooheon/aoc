@@ -24,22 +24,21 @@
                       :r (update from 0 #(+ % n)))
         [min-x max-x] (sort [(first from) to-x])
         [min-y max-y] (sort [(second from) to-y])]
-    {:from from
-     :to [to-x to-y]
-     :path (cond-> (for [x (range min-x (inc max-x))
-                         y (range min-y (inc max-y))]
-                     [x y])
-             (#{:d :l} dir) reverse
-             true rest)}))
+    (cond-> (for [x (range min-x (inc max-x))
+                  y (range min-y (inc max-y))]
+              [x y])
+      (#{:d :l} dir) reverse
+      true rest)))
 
 (defn wire-path [instructions]
-  (->> (reductions (fn [acc instr]
-                     (line (:to acc) instr))
-                   {:to [0 0]}
-                   instructions)
-       (map :path)
-       (apply concat)
-       (cons [0 0])))
+  (-> (reduce (fn [{:keys [end] :as acc} instr]
+                (let [l (line end instr)]
+                  (-> acc
+                      (update :path into l)
+                      (assoc :end (last l)))))
+              {:path [[0 0]] :end [0 0]}
+              instructions)
+      :path))
 
 (defn intersections [wire-paths]
   (->> wire-paths
@@ -72,7 +71,6 @@
      nearest-manhattan
      time)
 ;; "Elapsed time: 271.487309 msecs"
-
 
 ;; ans2
 (-> (map wire-path i)
