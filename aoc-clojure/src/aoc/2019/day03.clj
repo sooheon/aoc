@@ -17,16 +17,15 @@
 (def i (parse (u/input 2019 3)))
 
 (defn line [from [dir n]]
-  (let [[to-x to-y] (case dir
-                      :u (update from 1 #(+ % n))
-                      :d (update from 1 #(- % n))
-                      :l (update from 0 #(- % n))
-                      :r (update from 0 #(+ % n)))
-        [min-x max-x] (sort [(first from) to-x])
-        [min-y max-y] (sort [(second from) to-y])]
-    (cond-> (for [x (range min-x (inc max-x))
-                  y (range min-y (inc max-y))]
-              [x y])
+  (let [to (case dir
+             :u (update from 1 #(+ % n))
+             :d (update from 1 #(- % n))
+             :l (update from 0 #(- % n))
+             :r (update from 0 #(+ % n)))
+        [[x X] [y Y]] (map #(sort [%1 %2]) from to)]
+    (cond-> (for [xi (range x (inc X))
+                  yi (range y (inc Y))]
+              [xi yi])
       (#{:d :l} dir) reverse
       true rest)))
 
@@ -40,8 +39,8 @@
               instructions)
       :path))
 
-(defn intersections [wire-paths]
-  (->> wire-paths
+(defn intersection [paths]
+  (->> paths
        (map set)
        (apply set/intersection)))
 
@@ -57,24 +56,23 @@
        (reduce +)))
 
 (defn shortest-delay
-  "Given set of points where paths intersect, return the point where the sum
-   of all paths leading to the point is smallest."
+  "Finds all intersections, then returns the smallest sum of path distances to
+   an intersection."
   [paths]
-  (->> (set/difference (intersections paths) #{[0 0]})
+  (->> (set/difference (intersection paths) #{[0 0]})
        (map #(path-distance paths %))
        (apply min)))
 
 ;; ans1
-(->> i
-     (map wire-path)
-     intersections
-     nearest-manhattan
-     time)
-;; "Elapsed time: 271.487309 msecs"
+(-> (map wire-path i)
+    intersection
+    nearest-manhattan
+    time)
+;; "Elapsed time: 231.519547 msecs"
 
 ;; ans2
 (-> (map wire-path i)
     shortest-delay
     time)
-;; "Elapsed time: 876.94601 msecs"
+;; "Elapsed time: 722.363764 msecs"
 
