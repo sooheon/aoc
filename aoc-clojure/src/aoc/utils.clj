@@ -10,3 +10,6 @@
 
 (defn manhattan [[^Integer x ^Integer y]]
   (+ (Math/abs x) (Math/abs y)))
+
+(defn ->int [s]
+  (when s (Integer/parseInt s)))
