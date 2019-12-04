@@ -1,3 +1,7 @@
-{:paths ["resources" "src"]
- :deps {}
- :aliases {:test {:extra-paths ["test"]}}}
+{:paths ["resources" "src/main"]
+
+ :deps {quil {:mvn/version "3.1.0"}}
+
+ :aliases
+ {:dev {:extra-paths ["src/dev"]}
+  :test {:extra-paths ["test"]}}}

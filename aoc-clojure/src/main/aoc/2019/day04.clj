@@ -39,7 +39,8 @@
      time)
 
 ;; pt2
+(def password-2? (every-pred password? exact-doubles))
 (->> input-range
-     (filter (every-pred password? exact-doubles))
+     (filter password-2?)
      count
      time)
