@@ -10,7 +10,10 @@
    (let [memory (->> (str/split s #",")
                      (map str/trim)
                      (map u/->int))]
-     {:memory (vec memory) :pointer 0 :halted? false :input input})))
+     {:memory (vec memory)
+      :pointer 0
+      :halted? false
+      :input input})))
 
 (defn parse-opcode [n]
   {:opcode (rem n 100)
