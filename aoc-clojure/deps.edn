@@ -1,6 +1,7 @@
 {:paths ["resources" "src/main"]
 
- :deps {quil {:mvn/version "3.1.0"}}
+ :deps {com.clojure-goes-fast/clj-async-profiler {:mvn/version "0.4.0"}
+        quil {:mvn/version "3.1.0"}}
 
  :aliases
  {:dev {:extra-paths ["src/dev"]}

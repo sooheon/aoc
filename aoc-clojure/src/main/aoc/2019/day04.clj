@@ -1,46 +1,51 @@
 (ns aoc.2019.day04
   (:require [clojure.string :as str]
-            [aoc.utils :as u]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clj-async-profiler.core :as prof]
+            [aoc.utils :as u]))
 
 (def input-range
   (->> (str/split "245182-790572" #"-")
        (map u/->int)
-       (apply range)))
+       (apply range)
+       (map str)))
 
-(defn digits<= [n]
-  (->> (map int (str n))
-       (apply <=)))
+(defn digits<= [s]
+  (apply <= (map int s)))
 
-(defn repeats [n]
-  (->> (partition 2 1 (str n))
+(defn repeats [s]
+  (->> (partition 2 1 s)
        (filter #(apply = %))
        (map first)
-       (map str)
        seq))
 
 (def password? (every-pred
                 digits<=
                 repeats
-                #(= (count (str %)) 6)))
+                #(= (count %) 6)))
 
-(defn exact-doubles [n]
-  (let [triplet-or-longer (->> (re-seq #"(\d)\1{2,}" (str n))
+(defn exact-doubles [s]
+  (let [triplet-or-longer (->> (re-seq #"(\d)\1{2,}" s)
                                (map second))]
     (seq
      (set/difference
-      (set (repeats (str n)))
+      (set (map str (repeats s)))
       (set triplet-or-longer)))))
 
-;; pt1
-(->> input-range
-     (filter password?)
-     count
-     time)
-
-;; pt2
 (def password-2? (every-pred password? exact-doubles))
-(->> input-range
-     (filter password-2?)
-     count
-     time)
+
+(comment
+ (prof/serve-files 8888)
+ (prof/profile
+  {:return-file true}
+  (dotimes [_ 10]
+    ;; pt1
+    (->> input-range
+         (filter password?)
+         count
+         time)
+    ;; pt2
+    (->> input-range
+         (filter password-2?)
+         count
+         time))))
