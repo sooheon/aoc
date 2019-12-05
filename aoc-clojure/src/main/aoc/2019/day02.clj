@@ -31,6 +31,9 @@
           (update :memory run-instruction pointer)
           (update :pointer + 4)))))
 
+(defn init-state [memory]
+  {:memory memory :pointer 0})
+
 (defn final-state [state]
   (some #(when (:halted? %) (:memory %))
         (iterate step state)))
@@ -40,6 +43,8 @@
   [s]
   (let [init {:memory (parse-input s) :pointer 0}]
     (str/join "," (final-state init))))
+
+(first (final-state (init-state i)))
 
 ;; pt 2
 (defn pt2 []
