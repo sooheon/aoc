@@ -7,30 +7,27 @@
    argument."
   ([s] (init-state s nil))
   ([s input]
-   (let [memory (->> (str/split s #",")
-                     (map str/trim)
-                     (map u/->int))]
-     {:memory (vec memory)
-      :pointer 0
-      :halted? false
-      :input input})))
+   {:memory (->> (str/split s #",")
+                 (map str/trim)
+                 (map u/->int)
+                 vec)
+    :pointer 0
+    :halted? false
+    :input input}))
 
 (defn parse-opcode [n]
   {:opcode (rem n 100)
-   :param-modes (->> (quot n 100)
-                     (format "%03d")
-                     reverse)})
+   :param-modes (reverse (format "%03d" (quot n 100)))})
 
 (defn step
   [{:keys [memory pointer input] :as st}]
   (let [{:keys [opcode param-modes]} (parse-opcode (memory pointer))
-        [ptr1 ptr2 ptr3] (->> (range 1 4)
-                              (map #(+ pointer %))
-                              (map (fn [param-mode param]
-                                     (case param-mode
-                                       \0 (get memory param)
-                                       \1 param))
-                                   param-modes))]
+        [ptr1 ptr2 ptr3] (map (fn [param-mode ptr]
+                                (case param-mode
+                                  \0 (get memory ptr)
+                                  \1 ptr))
+                              param-modes
+                              (map #(+ pointer %) (range 1 4)))]
     (case opcode
       99 (assoc st :halted? true)
       1 (-> (assoc-in st [:memory ptr3] (+ (memory ptr1) (memory ptr2)))
