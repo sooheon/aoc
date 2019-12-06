@@ -1,7 +1,8 @@
 {:paths ["resources" "src/main"]
 
  :deps {com.clojure-goes-fast/clj-async-profiler {:mvn/version "0.4.0"}
-        quil {:mvn/version "3.1.0"}}
+        quil {:mvn/version "3.1.0"}
+        criterium {:mvn/version "0.4.5"}}
 
  :aliases
  {:dev {:extra-paths ["src/dev"]}
