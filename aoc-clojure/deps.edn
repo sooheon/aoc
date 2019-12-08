@@ -1,6 +1,8 @@
 {:paths ["resources" "src/main"]
 
  :deps {com.clojure-goes-fast/clj-async-profiler {:mvn/version "0.4.0"}
+        org.clojure/math.combinatorics {:mvn/version "0.1.6"}
+        org.clojure/core.async {:mvn/version "0.6.532"}
         quil {:mvn/version "3.1.0"}
         criterium {:mvn/version "0.4.5"}}
 
