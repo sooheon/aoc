@@ -20,15 +20,15 @@
                          vec)
             :pointer 0
             :halted? false
-            :output (chan 1024)
-            :input (chan 1024)}]
+            :out (chan 1024)
+            :in (chan 1024)}]
      (when (not-empty inputs)
        (doseq [i inputs]
-         (>!! (:input c) i)))
+         (>!! (:in c) i)))
      c)))
 
 (defn step
-  [{:keys [memory pointer input] :as st}]
+  [{:keys [memory pointer in out] :as st}]
   (let [{:keys [opcode param-modes]} (parse-opcode (memory pointer))
         [ptr1 ptr2 ptr3] (map (fn [param-mode ptr]
                                 (case param-mode
@@ -42,12 +42,11 @@
             (update :pointer + 4))
       2 (-> (assoc-in st [:memory ptr3] (* (memory ptr1) (memory ptr2)))
             (update :pointer + 4))
-      3 (-> (assoc-in st [:memory ptr1] (<!! input))
+      3 (-> (assoc-in st [:memory ptr1] (<!! in))
             (update :pointer + 2))
-      4 (let [output (memory ptr1)]
-          (do
-            (>!! (:output st) output)
-            (update st :pointer + 2)))
+      4 (do
+          (>!! out (memory ptr1))
+          (update st :pointer + 2))
       5 (if-not (zero? (memory ptr1))
           (assoc st :pointer (memory ptr2))
           (update st :pointer + 3))
@@ -65,33 +64,27 @@
       c
       (recur (step c)))))
 
-(defn set-phases [prog phases]
-  (map #(init prog [%]) phases))
-
-(defn run-amps [amps]
-  (let [[a b c d e] amps
-        computed (map compute amps)]
-    (go
-      (>! (:input a) 0)
-      (loop []
-        (>! (:input b) (<! (:output a)))
-        (>! (:input c) (<! (:output b)))
-        (>! (:input d) (<! (:output c)))
-        (>! (:input e) (<! (:output d)))
-        (>! (:input a) (<! (:output e)))
-        (recur)))
-    (<!! (:input (<!! (first computed))))))
+(defn amplify-with-phases [prog phases]
+  (let [amps (map #(init prog [%]) phases)
+        [a b c d e] amps
+        [A & _] (map compute amps)]
+    (>!! (:in a) 0)
+    (a/pipe (:out a) (:in b))
+    (a/pipe (:out b) (:in c))
+    (a/pipe (:out c) (:in d))
+    (a/pipe (:out d) (:in e))
+    (a/pipe (:out e) (:in a))
+    ;; the final output of E goes to input of A
+    (<!! (:in (<!! A)))))
 
 (comment
  (let [prog (u/input 2019 7)]
    (->> (combo/permutations (range 5))
-        (map #(set-phases prog %))
-        (map run-amps)
+        (map #(amplify-with-phases prog %))
         (apply max)))
  ;; ans: 79723
  (let [prog (u/input 2019 7)]
    (->> (combo/permutations (map #(+ 5 %) (range 5)))
-        (map #(set-phases prog %))
-        (map run-amps)
+        (map #(amplify-with-phases prog %))
         (apply max))))
 ;; ans: 70602018

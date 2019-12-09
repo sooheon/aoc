@@ -13,14 +13,14 @@
                  vec)
     :pointer 0
     :halted? false
-    :input input}))
+    :in input}))
 
 (defn parse-opcode [n]
   {:opcode (rem n 100)
    :param-modes (reverse (format "%03d" (quot n 100)))})
 
 (defn step
-  [{:keys [memory pointer input] :as st}]
+  [{:keys [memory pointer in] :as st}]
   (let [{:keys [opcode param-modes]} (parse-opcode (memory pointer))
         [ptr1 ptr2 ptr3] (map (fn [param-mode ptr]
                                 (case param-mode
@@ -34,9 +34,9 @@
             (update :pointer + 4))
       2 (-> (assoc-in st [:memory ptr3] (* (memory ptr1) (memory ptr2)))
             (update :pointer + 4))
-      3 (-> (assoc-in st [:memory ptr1] (or input (u/->int (read-line))))
+      3 (-> (assoc-in st [:memory ptr1] (or in (u/->int (read-line))))
             (update :pointer + 2))
-      4 (-> (assoc st :output (memory ptr1))
+      4 (-> (assoc st :out (memory ptr1))
             (update :pointer + 2))
       5 (if-not (zero? (memory ptr1))
           (assoc st :pointer (memory ptr2))
@@ -57,6 +57,6 @@
 (comment
  (def i (u/input 2019 5))
  ;; ans 1
- (:output (compute (init-state i 1)))
+ (:out (compute (init-state i 1)))
  ;; ans 2
- (:output (compute (init-state i 5))))
+ (:out (compute (init-state i 5))))
