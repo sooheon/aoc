@@ -76,10 +76,10 @@
   "After running amps A~E in a serial loop, returns the final output of E"
   [amps]
   (let [[a b c d e] amps]
-    (>!! (:in a) 0)
     (a/pipe (:out a) (:in b))
     (a/pipe (:out b) (:in c))
     (a/pipe (:out c) (:in d))
     (a/pipe (:out d) (:in e))
     (a/pipe (:out e) (:in a))
+    (>!! (:in a) 0)
     (last (:output (<!! (last (map compute amps)))))))

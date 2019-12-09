@@ -6,10 +6,10 @@
   [c p]
   (get-in c [:memory p] 0))
 
-(defn halt! [{:keys [in out] :as computer}]
+(defn halt! [{:keys [in out] :as c}]
   (a/close! in)
   (a/close! out)
-  (assoc computer :halted? true))
+  (assoc c :halted? true))
 
 (defn op [f c p1 p2 p3]
   (-> (assoc-in c [:memory p3] (f (getm c p1) (getm c p2)))
