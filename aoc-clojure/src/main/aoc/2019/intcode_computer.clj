@@ -63,23 +63,24 @@
       9 (ops/update-base c p1)
       99 (ops/halt! c))))
 
-(defn compute [state]
-  (a/go-loop [c state]
+(defn run
+  "Runs intcode computer asynchronously. Final state has key :output for any
+   outputs."
+  [computer]
+  (a/go-loop [c computer]
     (if (:halted? c)
       c
       (recur (step! c)))))
 
-(defn set-phases [prog phases]
+(defn set-phases
+  "Initializes prog to a list of amps with corresponding phase from phases."
+  [prog phases]
   (map #(init prog [%]) phases))
 
 (defn amplify-loop
   "After running amps A~E in a serial loop, returns the final output of E"
   [amps]
-  (let [[a b c d e] amps]
-    (a/pipe (:out a) (:in b))
-    (a/pipe (:out b) (:in c))
-    (a/pipe (:out c) (:in d))
-    (a/pipe (:out d) (:in e))
-    (a/pipe (:out e) (:in a))
-    (>!! (:in a) 0)
-    (last (:output (<!! (last (map compute amps)))))))
+  (doseq [[from to] (partition 2 1 (concat amps (take 1 amps)))]
+    (a/pipe (:out from) (:in to)))
+  (>!! (:in (first amps)) 0)
+  (last (:output (<!! (last (map run amps))))))
