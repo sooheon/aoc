@@ -68,3 +68,18 @@
     (if (:halted? c)
       c
       (recur (step! c)))))
+
+(defn set-phases [prog phases]
+  (map #(init prog [%]) phases))
+
+(defn amplify-loop
+  "After running amps A~E in a serial loop, returns the final output of E"
+  [amps]
+  (let [[a b c d e] amps]
+    (>!! (:in a) 0)
+    (a/pipe (:out a) (:in b))
+    (a/pipe (:out b) (:in c))
+    (a/pipe (:out c) (:in d))
+    (a/pipe (:out d) (:in e))
+    (a/pipe (:out e) (:in a))
+    (last (:output (<!! (last (map compute amps)))))))
