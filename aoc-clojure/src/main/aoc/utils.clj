@@ -31,3 +31,8 @@
   (int (rem (/ (bigdec n)
                (bigdec (Math/pow 10 i)))
             10)))
+
+(defn gcd [a b]
+  (if (zero? b)
+    a
+    (recur b (mod a b))))
