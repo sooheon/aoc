@@ -52,15 +52,16 @@
       angle)))
 
 (defn destroy-order [asteroids base]
-  (loop [base base
-         asteroids asteroids
+  (loop [asteroids (set/difference asteroids #{base})
+         base base
          destroyed []]
     (let [targets (->> (get (visibility asteroids) base)
                        (sort-by #(bearing base %)))
           remaining (set/difference asteroids (set targets))]
+      (println remaining)
       (if (empty? remaining)
         destroyed
-        (recur base remaining (concat destroyed targets))))))
+        (recur remaining base (concat destroyed targets))))))
 
 (comment
  (def i (u/input 2019 10))
