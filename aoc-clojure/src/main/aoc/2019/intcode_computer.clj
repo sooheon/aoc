@@ -56,8 +56,8 @@
       99 (op/halt! c))))
 
 (defn run
-  "Runs intcode computer asynchronously. Final state has key :output for any
-   outputs."
+  "Runs intcode computer asynchronously. Final state has key :output to hold
+   outputs, as :out channel is ephemeral."
   [computer]
   (a/go-loop [c computer]
     (if (:halted? c)

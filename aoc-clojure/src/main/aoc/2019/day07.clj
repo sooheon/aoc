@@ -2,8 +2,7 @@
   (:require [aoc.utils :as u]
             [clojure.string :as str]
             [clojure.math.combinatorics :as combo]
-            [clojure.core.async :as a
-             :refer [>! <! >!! <!! go chan buffer close! alts!]]))
+            [clojure.core.async :as a :refer [>!! <!!]]))
 
 (defn parse-opcode [n]
   {:param-modes (reverse (format "%03d" (quot n 100)))
@@ -20,8 +19,8 @@
                          vec)
             :pointer 0
             :halted? false
-            :out (chan 1024)
-            :in (chan 1024)}]
+            :out (a/chan 1024)
+            :in (a/chan 1024)}]
      (when (not-empty inputs)
        (doseq [i inputs]
          (>!! (:in c) i)))

@@ -19,5 +19,4 @@
 
 (let [heading (rand-int 4)
       direction-command (rand-int 2)]
-  (move [0 0]
-        (new-heading heading direction-command)))
+  (move [0 0] (new-heading heading direction-command)))

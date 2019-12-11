@@ -38,5 +38,3 @@
 (defn move-base [c p1]
   (-> (update c :relative-base + (getm c p1))
       (update :pointer + 2)))
-
-
