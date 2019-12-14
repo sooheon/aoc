@@ -36,3 +36,12 @@
   (if (zero? b)
     a
     (recur b (mod a b))))
+
+(defn lcm [nums]
+  (letfn [(increment-least-by [a b]
+            (let [idx (.indexOf a (apply min a))]
+              (update a idx + (get b idx))))]
+    (loop [n nums]
+      (if (apply = n)
+        (first n)
+        (recur (increment-least-by n nums))))))

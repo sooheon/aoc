@@ -26,7 +26,7 @@
   ([prog-str] (run-painter prog-str {}))
   ([prog-str hull]
    (let [painter (ic/init prog-str)]
-     (ic/run painter)
+     (ic/compute! painter)
      (a/go-loop [hull (merge {:position [0 0]
                               :heading [0 -1]
                               :visited #{}

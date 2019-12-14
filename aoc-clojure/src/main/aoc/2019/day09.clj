@@ -8,9 +8,9 @@
  ;; part 1
  (let [c (ic/init (u/input 2019 9))]
    (>!! (:in c) 1)
-   (first (:output (<!! (ic/run c)))))
+   (first (:output (<!! (ic/compute! c)))))
 
  ;; part 2
  (let [c (ic/init (u/input 2019 9))]
    (>!! (:in c) 2)
-   (first (:output (<!! (ic/run c))))))
+   (first (:output (<!! (ic/compute! c))))))
