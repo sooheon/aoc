@@ -1,7 +1,8 @@
 (ns aoc.utils
   (:require
    [clojure.java.io :as io]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [clojure.data.priority-map :refer [priority-map]]))
 
 (defn input
   [season day]
@@ -45,3 +46,38 @@
       (if (apply = n)
         (first n)
         (recur (increment-least-by n nums))))))
+
+(defn get-some
+  "Returns first elem in coll for which (pred elem) returns true."
+  [pred coll]
+  (some #(if (pred %)
+           %)
+        coll))
+
+(defn map-vals
+  [m f]
+  (reduce-kv
+   (fn [m k v]
+     (assoc m k (f v)))
+   {} m))
+
+(defn remove-keys [m pred]
+  (select-keys m (remove pred (keys m))))
+
+(defn djikstra
+  "Computes single-source shortest path distances in a directed graph.
+
+  Given a node n, (f n) should return a map with the successors of n as keys
+  and their (non-negative) distances from n as vals.
+
+  Returns a map from nodes to their distance from start."
+  [start f]
+  (loop [queue (priority-map start 0)
+         result {}]
+    (if-let [[v d] (peek queue)]
+      (let [dist (-> (f v)
+                     (remove-keys result)
+                     (map-vals (partial + d)))]
+        (recur (merge-with min (pop queue) dist)
+               (assoc result v d)))
+      result)))

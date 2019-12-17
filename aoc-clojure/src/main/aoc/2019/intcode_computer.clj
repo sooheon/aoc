@@ -74,12 +74,12 @@
       c
       (recur (step! c)))))
 
-(defn compute-sync!
+(defn compute-w-user-prompt!
   [computer]
   (loop [c computer]
     (if (:halted? c)
       c
-      (recur (step! c :sync)))))
+      (recur (step! c :prompt-user)))))
 
 (defn set-phases
   "Initializes prog to a list of amps with corresponding phase from phases."
